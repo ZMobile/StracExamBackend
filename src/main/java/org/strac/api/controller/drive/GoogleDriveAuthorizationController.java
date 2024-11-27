@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.strac.model.CredentialsResource;
+import org.strac.service.google.token.GoogleAccessTokenRefreshService;
 
 import java.io.IOException;
 
@@ -23,6 +24,9 @@ public class GoogleDriveAuthorizationController {
     @Autowired
     private String redirectUri;
 
+    @Autowired
+    private GoogleAccessTokenRefreshService googleAccessTokenRefreshService;
+
     @GetMapping("/auth")
     public String authorizeUser() {
         return googleAuthorizationCodeFlow.newAuthorizationUrl()
@@ -36,7 +40,6 @@ public class GoogleDriveAuthorizationController {
             GoogleTokenResponse googleTokenResponse = googleAuthorizationCodeFlow.newTokenRequest(code)
                     .setRedirectUri(redirectUri)
                     .execute();
-            // Generate a JWT containing the Google access token
             CredentialsResource credentialsResource = new CredentialsResource(googleTokenResponse.getAccessToken(), googleTokenResponse.getRefreshToken());
             return gson.toJson(credentialsResource);
         } catch (IOException e) {
@@ -45,26 +48,14 @@ public class GoogleDriveAuthorizationController {
     }
 
     @PostMapping("/refresh")
-    public CredentialsResource refreshAccessToken(@RequestHeader("Authorization") String refreshToken) {
-        System.out.println("Refreshing...");
+    public String refreshAccessToken(@RequestHeader("Authorization") String refreshToken) {
         String trimmedRefreshToken = refreshToken;
         if (refreshToken.startsWith("Bearer")) {
             trimmedRefreshToken = refreshToken.substring(7);
         }
-        System.out.println("Trimmed refresh token: " + trimmedRefreshToken);
-        try {
 
-            // Exchange the refresh token for a new access token
-            GoogleTokenResponse tokenResponse = googleAuthorizationCodeFlow
-                    .newTokenRequest(null) // Pass null since we're refreshing, not exchanging an auth code
-                    .setGrantType("refresh_token")
-                    .setRefreshToken(trimmedRefreshToken) // Set the refresh token here
-                    .execute();
-
-            // Generate a new JWT containing the refreshed tokens
-            return new CredentialsResource(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
-        } catch (IOException e) {
-            throw new RuntimeException("Error refreshing access token", e);
-        }
+        String newAccessToken = googleAccessTokenRefreshService.refreshAccessToken(trimmedRefreshToken);
+        CredentialsResource credentialsResource = new CredentialsResource(newAccessToken, trimmedRefreshToken);
+        return gson.toJson(credentialsResource);
     }
 }
