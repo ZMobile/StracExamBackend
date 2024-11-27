@@ -32,14 +32,7 @@ public interface GoogleDriveDao {
      */
     File uploadFile(Credential credential, java.io.File localFile, String mimeType, String folderId);
 
-    /**
-     * Download a file from Google Drive.
-     *
-     * @param credential The OAuth credential containing the access token.
-     * @param fileId     The ID of the file to download.
-     * @param destinationPath The local destination path for the downloaded file.
-     */
-    void downloadFile(Credential credential, String fileId, String destinationPath);
+    void downloadFileToStream(Credential credential, String fileId, OutputStream outputStream);
 
     /**
      * Delete a file from Google Drive.

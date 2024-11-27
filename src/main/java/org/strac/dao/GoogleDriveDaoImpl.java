@@ -77,27 +77,57 @@ public class GoogleDriveDaoImpl implements GoogleDriveDao {
         }
     }
 
-    /**
-     * Download a file from Google Drive.
-     *
-     * @param credential The OAuth credential containing the access token.
-     * @param fileId     The ID of the file to download.
-     * @param destinationPath The local destination path for the downloaded file.
-     */
     @Override
-    public void downloadFile(Credential credential, String fileId, String destinationPath) {
+    public void downloadFileToStream(Credential credential, String fileId, OutputStream outputStream) {
         try {
-            // Create a Drive service instance
             Drive driveService = createDriveService(credential);
 
-            // Create output stream for the local file
-            try (OutputStream outputStream = new FileOutputStream(destinationPath)) {
+            // Fetch file metadata to determine the MIME type
+            Drive.Files.Get metadataRequest = driveService.files().get(fileId).setFields("mimeType, name");
+            com.google.api.services.drive.model.File fileMetadata = metadataRequest.execute();
+            String mimeType = fileMetadata.getMimeType();
+            String fileName = fileMetadata.getName();
+            System.out.println("File Name: " + fileName);
+            System.out.println("MIME Type: " + mimeType);
+
+            // Check if the file is a Google Workspace file that requires export
+            if (mimeType.startsWith("application/vnd.google-apps")) {
+                // Export the file to a supported MIME type
+                String exportMimeType = getExportMimeType(mimeType);
+                if (exportMimeType == null) {
+                    throw new RuntimeException("File type not supported for export: " + mimeType);
+                }
+                System.out.println("Exporting file to MIME type: " + exportMimeType);
+                driveService.files().export(fileId, exportMimeType).executeMediaAndDownloadTo(outputStream);
+            } else {
+                // Directly download the binary file
+                System.out.println("Downloading binary file...");
                 driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error downloading file from Google Drive", e);
         }
     }
+
+    /**
+     * Get the appropriate export MIME type for Google Workspace files.
+     *
+     * @param mimeType The MIME type of the file.
+     * @return The export MIME type, or null if the file type is not supported for export.
+     */
+    private String getExportMimeType(String mimeType) {
+        switch (mimeType) {
+            case "application/vnd.google-apps.document":
+                return "application/pdf"; // Export Google Docs as PDF
+            case "application/vnd.google-apps.spreadsheet":
+                return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; // Export Sheets as Excel
+            case "application/vnd.google-apps.presentation":
+                return "application/vnd.openxmlformats-officedocument.presentationml.presentation"; // Export Slides as PPTX
+            default:
+                return null; // Unsupported Google Workspace file type
+        }
+    }
+
 
     /**
      * Delete a file from Google Drive.

@@ -8,5 +8,7 @@ public interface ZipService {
     void zipFolder(File folder, String parentFolder, ZipOutputStream zos) throws IOException;
 
     void deleteFolder(File folder);
+
+    void addFileToZip(ZipOutputStream zos, String filePath, byte[] fileContent) throws IOException;
 }
 

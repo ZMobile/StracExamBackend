@@ -9,8 +9,9 @@ import org.strac.dao.GoogleDriveDao;
 import org.strac.service.file.MultipartFileToFileTransformerService;
 import org.strac.service.file.ZipService;
 
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 
@@ -74,70 +75,53 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         }
     }
 
-    /**
-     * Download a file from Google Drive.
-     *
-     * @param accessToken The access token for Google API.
-     * @param fileId The ID of the file to download.
-     * @param destinationPath The local destination path for the downloaded file.
-     */
-    public void downloadFile(String accessToken, String fileId, String destinationPath) {
+    @Override
+    public void downloadFileToStream(String accessToken, String fileId, OutputStream outputStream) {
         try {
             Credential credential = googleDriveCredentialService.createCredentialFromAccessToken(accessToken);
-
-            googleDriveDao.downloadFile(credential, fileId, destinationPath);
+            googleDriveDao.downloadFileToStream(credential, fileId, outputStream);
         } catch (Exception e) {
             throw new RuntimeException("Error downloading file from Google Drive", e);
         }
     }
 
+
     /**
-     * Download a folder from Google Drive.
+     * Download a folder from Google Drive as a zipped stream.
      *
      * @param accessToken The access token for Google API.
-     * @param folderId The ID of the folder to download.
-     * @param destinationPath The local destination path for the downloaded folder.
+     * @param folderId    The ID of the folder to download.
+     * @param outputStream The HTTP output stream to write the zip data to.
      */
-    public void downloadFolder(String accessToken, String folderId, String destinationPath) {
+    @Override
+    public void downloadFolderAsStream(String accessToken, String folderId, OutputStream outputStream) {
         try {
             Credential credential = googleDriveCredentialService.createCredentialFromAccessToken(accessToken);
 
-            // Create a temporary folder for downloaded contents
-            java.io.File tempFolder = new java.io.File("temp_download");
-            if (!tempFolder.exists()) {
-                tempFolder.mkdir();
+            // Use a ZipOutputStream to stream the folder contents
+            try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
+                fetchAndDownloadFolderContentsToStream(credential, folderId, "", zos);
             }
-
-            // Recursively fetch and download folder contents
-            fetchAndDownloadFolderContents(credential, folderId, tempFolder);
-
-            // Zip the folder using the ZipService
-            java.io.File zipFile = new java.io.File(destinationPath);
-            try (FileOutputStream fos = new FileOutputStream(zipFile);
-                 ZipOutputStream zos = new ZipOutputStream(fos)) {
-                zipService.zipFolder(tempFolder, tempFolder.getName(), zos);
-            }
-
-            // Cleanup temporary files using the ZipService
-            zipService.deleteFolder(tempFolder);
-
         } catch (Exception e) {
-            throw new RuntimeException("Error downloading folder from Google Drive", e);
+            throw new RuntimeException("Error streaming folder from Google Drive", e);
         }
     }
 
-    private void fetchAndDownloadFolderContents(Credential credential, String folderId, java.io.File localFolder) {
+    private void fetchAndDownloadFolderContentsToStream(Credential credential, String folderId, String currentPath, ZipOutputStream zos) {
         FileList fileList = googleDriveDao.listFiles(credential, folderId);
         for (File file : fileList.getFiles()) {
+            String filePath = currentPath.isEmpty() ? file.getName() : currentPath + "/" + file.getName();
             if ("application/vnd.google-apps.folder".equals(file.getMimeType())) {
-                // If the file is a folder, recursively fetch its contents
-                java.io.File subFolder = new java.io.File(localFolder, file.getName());
-                subFolder.mkdir();
-                fetchAndDownloadFolderContents(credential, file.getId(), subFolder);
+                // Recursively fetch and download folder contents
+                fetchAndDownloadFolderContentsToStream(credential, file.getId(), filePath, zos);
             } else {
-                // If it's a file, download it
-                java.io.File localFile = new java.io.File(localFolder, file.getName());
-                googleDriveDao.downloadFile(credential, file.getId(), localFile.getAbsolutePath());
+                // If it's a file, add it to the zip
+                try (ByteArrayOutputStream fileOutputStream = new ByteArrayOutputStream()) {
+                    googleDriveDao.downloadFileToStream(credential, file.getId(), fileOutputStream);
+                    zipService.addFileToZip(zos, filePath, fileOutputStream.toByteArray());
+                } catch (IOException e) {
+                    throw new RuntimeException("Error adding file to zip: " + filePath, e);
+                }
             }
         }
     }

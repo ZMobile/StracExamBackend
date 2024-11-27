@@ -5,6 +5,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.OutputStream;
 import java.util.List;
 
 public interface GoogleDriveService {
@@ -29,23 +30,9 @@ public interface GoogleDriveService {
      */
     List<File> listFiles(String accessToken, String parentId);
 
-    /**
-     * Download a file from Google Drive.
-     *
-     * @param accessToken The access token for Google API.
-     * @param fileId The ID of the file to download.
-     * @param destinationPath The local destination path for the downloaded file.
-     */
-    void downloadFile(String accessToken, String fileId, String destinationPath);
+    void downloadFileToStream(String accessToken, String fileId, OutputStream outputStream);
 
-    /**
-     * Download a folder from Google Drive.
-     *
-     * @param accessToken The access token for Google API.
-     * @param folderId The ID of the folder to download.
-     * @param destinationPath The local destination path for the downloaded folder.
-     */
-    void downloadFolder(String accessToken, String folderId, String destinationPath);
+    void downloadFolderAsStream(String accessToken, String folderId, OutputStream outputStream);
 
     /**
      * Delete a file from Google Drive.

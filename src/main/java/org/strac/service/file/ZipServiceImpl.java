@@ -44,4 +44,14 @@ public class ZipServiceImpl implements ZipService {
         }
         folder.delete();
     }
+
+    @Override
+    public void addFileToZip(ZipOutputStream zos, String filePath, byte[] fileContent) throws IOException {
+        // Create a new zip entry for the file
+        ZipEntry zipEntry = new ZipEntry(filePath);
+        zos.putNextEntry(zipEntry);
+        // Write file content to the zip
+        zos.write(fileContent);
+        zos.closeEntry();
+    }
 }
