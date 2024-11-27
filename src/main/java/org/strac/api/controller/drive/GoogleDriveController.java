@@ -53,11 +53,25 @@ public class GoogleDriveController {
      * @param destinationPath The local path where the file should be saved.
      * @param accessToken    The access token extracted from the SecurityContext.
      */
-    @GetMapping("/download")
+    @GetMapping("/download/file")
     public void downloadFile(@RequestParam("fileId") String fileId,
                              @RequestParam("destinationPath") String destinationPath,
                              @AuthenticationPrincipal String accessToken) {
         googleDriveService.downloadFile(accessToken, fileId, destinationPath);
+    }
+
+    /**
+     * Download a folder from Google Drive.
+     *
+     * @param folderId         The ID of the folder to download.
+     * @param destinationPath The local path where the folder should be saved.
+     * @param accessToken    The access token extracted from the SecurityContext.
+     */
+    @GetMapping("/download/folder")
+    public void downloadFolder(@RequestParam("folderId") String folderId,
+                               @RequestParam("destinationPath") String destinationPath,
+                               @AuthenticationPrincipal String accessToken) {
+        googleDriveService.downloadFolder(accessToken, folderId, destinationPath);
     }
 
     /**

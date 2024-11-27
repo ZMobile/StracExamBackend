@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.strac.api.filter.GoogleAccessTokenAuthenticationFilter;
 import org.strac.service.config.StracExamServiceConfig;
-import org.strac.service.google.jwt.GoogleAccessTokenValidatorService;
+import org.strac.service.google.token.GoogleAccessTokenValidatorService;
 
 @EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -27,6 +27,7 @@ public class StracExamSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/test").permitAll() // Ensure the exact path is included
                         .requestMatchers(HttpMethod.GET, "/oauth2/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/drive/**").authenticated()
                         .anyRequest().authenticated() // Ensure other endpoints are protected
                 )

@@ -39,6 +39,15 @@ public interface GoogleDriveService {
     void downloadFile(String accessToken, String fileId, String destinationPath);
 
     /**
+     * Download a folder from Google Drive.
+     *
+     * @param accessToken The access token for Google API.
+     * @param folderId The ID of the folder to download.
+     * @param destinationPath The local destination path for the downloaded folder.
+     */
+    void downloadFolder(String accessToken, String folderId, String destinationPath);
+
+    /**
      * Delete a file from Google Drive.
      *
      * @param accessToken The access token for Google API.

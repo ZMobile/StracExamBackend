@@ -54,7 +54,8 @@ public class StracExamDaoConfig {
                 netHttpTransport,
                 jsonFactory,
                 googleClientSecrets,
-                Collections.singletonList("https://www.googleapis.com/auth/drive.file")
+                //Collections.singletonList("https://www.googleapis.com/auth/drive.file")
+                Collections.singletonList("https://www.googleapis.com/auth/drive")
         )
                 .setAccessType("offline") // Needed for refresh tokens
                 .build();
