@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.strac.api.filter.GoogleAccessTokenAuthenticationFilter;
 import org.strac.service.config.StracExamServiceConfig;
-import org.strac.service.google.token.GoogleAccessTokenValidatorService;
+import org.strac.dao.token.GoogleAccessTokenValidatorDao;
 
 @EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -40,7 +40,7 @@ public class StracExamSecurityConfig {
     }
 
     @Bean
-    public GoogleAccessTokenAuthenticationFilter googleAccessTokenAuthenticationFilter(GoogleAccessTokenValidatorService googleAccessTokenValidatorService) {
-        return new GoogleAccessTokenAuthenticationFilter(googleAccessTokenValidatorService);
+    public GoogleAccessTokenAuthenticationFilter googleAccessTokenAuthenticationFilter(GoogleAccessTokenValidatorDao googleAccessTokenValidatorDao) {
+        return new GoogleAccessTokenAuthenticationFilter(googleAccessTokenValidatorDao);
     }
 }

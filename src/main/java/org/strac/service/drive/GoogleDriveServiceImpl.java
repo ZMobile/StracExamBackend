@@ -1,4 +1,4 @@
-package org.strac.service.google.drive;
+package org.strac.service.drive;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.drive.model.File;
@@ -32,36 +32,19 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         this.zipService = zipService;
     }
 
-    /**
-     * Upload a file to Google Drive.
-     *
-     * @param accessToken The access token for Google API.
-     * @param multipartFile The file to upload.
-     * @param folderId The target folder ID (optional).
-     * @return Metadata of the uploaded file.
-     */
-    public File uploadFile(String accessToken, MultipartFile multipartFile, String folderId) {
+    public void uploadFile(String accessToken, MultipartFile multipartFile, String folderId) {
         try {
             Credential credential = googleDriveCredentialService.createCredentialFromAccessToken(accessToken);
 
             // Convert MultipartFile to java.io.File
             java.io.File file = multipartFileToFileTransformerService.convertMultipartFileToFile(multipartFile);
 
-            return googleDriveDao.uploadFile(credential, file, multipartFile.getContentType(), folderId);
+            googleDriveDao.uploadFile(credential, file, multipartFile.getContentType(), folderId);
         } catch (Exception e) {
             throw new RuntimeException("Error uploading file to Google Drive", e);
         }
     }
 
-    /**
-     * List files from Google Drive.
-     * If a parent folder ID is provided, lists files under that folder.
-     * Otherwise, lists top-level files.
-     *
-     * @param accessToken The access token for Google API.
-     * @param parentId The parent folder ID (optional).
-     * @return List of files.
-     */
     public List<File> listFiles(String accessToken, String parentId) {
         try {
             Credential credential = googleDriveCredentialService.createCredentialFromAccessToken(accessToken);

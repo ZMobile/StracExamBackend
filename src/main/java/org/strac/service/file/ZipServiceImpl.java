@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -13,7 +14,7 @@ public class ZipServiceImpl implements ZipService {
 
     @Override
     public void zipFolder(File folder, String parentFolder, ZipOutputStream zos) throws IOException {
-        for (File file : folder.listFiles()) {
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
             if (file.isDirectory()) {
                 // Recursively add folders
                 zipFolder(file, parentFolder + "/" + file.getName(), zos);

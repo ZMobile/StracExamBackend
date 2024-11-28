@@ -10,16 +10,16 @@ import org.strac.dao.GoogleDriveDao;
 import org.strac.dao.config.StracExamDaoConfig;
 import org.strac.service.file.ZipService;
 import org.strac.service.file.ZipServiceImpl;
-import org.strac.service.google.drive.GoogleDriveCredentialService;
-import org.strac.service.google.drive.GoogleDriveCredentialServiceImpl;
-import org.strac.service.google.drive.GoogleDriveService;
-import org.strac.service.google.drive.GoogleDriveServiceImpl;
+import org.strac.service.drive.GoogleDriveCredentialService;
+import org.strac.service.drive.GoogleDriveCredentialServiceImpl;
+import org.strac.service.drive.GoogleDriveService;
+import org.strac.service.drive.GoogleDriveServiceImpl;
 import org.strac.service.file.MultiPartFileToFileTransformerServiceImpl;
 import org.strac.service.file.MultipartFileToFileTransformerService;
-import org.strac.service.google.token.GoogleAccessTokenRefreshService;
-import org.strac.service.google.token.GoogleAccessTokenRefreshServiceImpl;
-import org.strac.service.google.token.GoogleAccessTokenValidatorService;
-import org.strac.service.google.token.GoogleAccessTokenValidatorServiceImpl;
+import org.strac.dao.token.GoogleAccessTokenRefreshDao;
+import org.strac.dao.token.GoogleAccessTokenRefreshDaoImpl;
+import org.strac.dao.token.GoogleAccessTokenValidatorDao;
+import org.strac.dao.token.GoogleAccessTokenValidatorDaoImpl;
 
 @Configuration
 @Import({StracExamDaoConfig.class})
@@ -48,14 +48,14 @@ public class StracExamServiceConfig {
     }
 
     @Bean
-    public GoogleAccessTokenValidatorService tokenValidatorService() {
-        return new GoogleAccessTokenValidatorServiceImpl();
+    public GoogleAccessTokenValidatorDao tokenValidatorService() {
+        return new GoogleAccessTokenValidatorDaoImpl();
     }
 
     @Bean
-    public GoogleAccessTokenRefreshService tokenRefreshService(GoogleClientSecrets googleClientSecrets,
-                                                               NetHttpTransport netHttpTransport,
-                                                               JsonFactory jsonFactory) {
-        return new GoogleAccessTokenRefreshServiceImpl(googleClientSecrets, netHttpTransport, jsonFactory);
+    public GoogleAccessTokenRefreshDao tokenRefreshService(GoogleClientSecrets googleClientSecrets,
+                                                           NetHttpTransport netHttpTransport,
+                                                           JsonFactory jsonFactory) {
+        return new GoogleAccessTokenRefreshDaoImpl(googleClientSecrets, netHttpTransport, jsonFactory);
     }
 }

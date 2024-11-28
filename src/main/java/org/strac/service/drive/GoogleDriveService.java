@@ -1,4 +1,4 @@
-package org.strac.service.google.drive;
+package org.strac.service.drive;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.drive.model.File;
@@ -17,7 +17,7 @@ public interface GoogleDriveService {
      * @param folderId The target folder ID (optional).
      * @return Metadata of the uploaded file.
      */
-    File uploadFile(String accessToken, MultipartFile multipartFile, String folderId);
+    void uploadFile(String accessToken, MultipartFile multipartFile, String folderId);
 
     /**
      * List files from Google Drive.
@@ -30,8 +30,22 @@ public interface GoogleDriveService {
      */
     List<File> listFiles(String accessToken, String parentId);
 
+    /**
+     * Download a file from Google Drive to a stream.
+     *
+     * @param accessToken The access token for Google API.
+     * @param fileId The ID of the file to download.
+     * @param outputStream The OutputStream to write the file to.
+     */
     void downloadFileToStream(String accessToken, String fileId, OutputStream outputStream);
 
+    /**
+     * Download a folder from Google Drive as a zip.
+     *
+     * @param accessToken The access token for Google API.
+     * @param folderId The ID of the folder to download.
+     * @param outputStream The OutputStream to write the zip to.
+     */
     void downloadFolderAsStream(String accessToken, String folderId, OutputStream outputStream);
 
     /**

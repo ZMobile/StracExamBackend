@@ -1,28 +1,26 @@
-package org.strac.service.google.token;
+package org.strac.dao.token;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class GoogleAccessTokenRefreshServiceImpl implements GoogleAccessTokenRefreshService {
+public class GoogleAccessTokenRefreshDaoImpl implements GoogleAccessTokenRefreshDao {
     private final GoogleClientSecrets googleClientSecrets;
     private final NetHttpTransport netHttpTransport;
     private final JsonFactory jsonFactory;
 
-    public GoogleAccessTokenRefreshServiceImpl(GoogleClientSecrets googleClientSecrets,
-                                               NetHttpTransport netHttpTransport,
-                                               JsonFactory jsonFactory) {
+    public GoogleAccessTokenRefreshDaoImpl(GoogleClientSecrets googleClientSecrets,
+                                           NetHttpTransport netHttpTransport,
+                                           JsonFactory jsonFactory) {
         this.googleClientSecrets = googleClientSecrets;
         this.netHttpTransport = netHttpTransport;
         this.jsonFactory = jsonFactory;

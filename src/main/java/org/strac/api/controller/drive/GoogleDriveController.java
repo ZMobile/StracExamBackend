@@ -8,10 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.strac.service.google.drive.GoogleDriveService;
+import org.strac.service.drive.GoogleDriveService;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -45,10 +44,11 @@ public class GoogleDriveController {
      * @return Metadata of the uploaded file.
      */
     @PostMapping("/upload")
-    public File uploadFile(@RequestParam("file") MultipartFile file,
+    public String uploadFile(@RequestParam("file") MultipartFile file,
                            @RequestParam(value = "folderId", required = false) String folderId,
                            @AuthenticationPrincipal String accessToken) {
-        return googleDriveService.uploadFile(accessToken, file, folderId);
+        googleDriveService.uploadFile(accessToken, file, folderId);
+        return "Success!";
     }
 
     /**
@@ -62,21 +62,12 @@ public class GoogleDriveController {
     public ResponseEntity<byte[]> downloadFile(@RequestParam("fileId") String fileId,
                                                @AuthenticationPrincipal String accessToken) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            // Log incoming request
-            System.out.println("Received request to download file with ID: " + fileId);
-            System.out.println("Access token: " + accessToken);
-
-            // Download the file into an output stream
             googleDriveService.downloadFileToStream(accessToken, fileId, outputStream);
-            System.out.println("File downloaded successfully into memory.");
 
             // Prepare HTTP headers
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileId + "\"");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
-
-            // Log response size
-            System.out.println("Returning file with size: " + outputStream.size() + " bytes");
 
             // Return the file as a response
             return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
@@ -128,7 +119,6 @@ public class GoogleDriveController {
     @DeleteMapping("/delete")
     public void deleteFile(@RequestParam("fileId") String fileId,
                            @AuthenticationPrincipal String accessToken) {
-        System.out.println("Test 00");
         googleDriveService.deleteFile(accessToken, fileId);
     }
 }

@@ -1,4 +1,4 @@
-package org.strac.service.google.token;
+package org.strac.dao.token;
 
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 @Repository
-public class GoogleAccessTokenValidatorServiceImpl implements GoogleAccessTokenValidatorService {
+public class GoogleAccessTokenValidatorDaoImpl implements GoogleAccessTokenValidatorDao {
 
     private static final String TOKEN_INFO_URL = "https://oauth2.googleapis.com/tokeninfo?access_token=";
 

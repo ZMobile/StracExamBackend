@@ -1,4 +1,4 @@
-package org.strac.service.google.drive;
+package org.strac.service.drive;
 
 import com.google.api.client.auth.oauth2.Credential;
 

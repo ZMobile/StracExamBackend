@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.strac.service.google.token.GoogleAccessTokenValidatorService;
+import org.strac.dao.token.GoogleAccessTokenValidatorDao;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -17,10 +17,10 @@ import java.util.List;
 
 @Component
 public class GoogleAccessTokenAuthenticationFilter extends OncePerRequestFilter {
-    private final GoogleAccessTokenValidatorService googleAccessTokenValidatorService;
+    private final GoogleAccessTokenValidatorDao googleAccessTokenValidatorDao;
 
-    public GoogleAccessTokenAuthenticationFilter(GoogleAccessTokenValidatorService googleAccessTokenValidatorService) {
-        this.googleAccessTokenValidatorService = googleAccessTokenValidatorService;
+    public GoogleAccessTokenAuthenticationFilter(GoogleAccessTokenValidatorDao googleAccessTokenValidatorDao) {
+        this.googleAccessTokenValidatorDao = googleAccessTokenValidatorDao;
     }
 
     // Define excluded paths that should skip validation
@@ -51,7 +51,7 @@ public class GoogleAccessTokenAuthenticationFilter extends OncePerRequestFilter 
             try {
                 System.out.println("Filtering...");
                 // Validate the Google API access token using the service
-                boolean isValid = googleAccessTokenValidatorService.validateGoogleAccessToken(accessToken);
+                boolean isValid = googleAccessTokenValidatorDao.validateGoogleAccessToken(accessToken);
                 System.out.println("Is valid: " + isValid);
                 if (isValid) {
                     // If token is valid, proceed with authentication

@@ -2,13 +2,13 @@ package org.strac.api.controller.drive;
 
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.gson.Gson;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.strac.model.CredentialsResource;
-import org.strac.service.google.token.GoogleAccessTokenRefreshService;
+import org.strac.dao.token.GoogleAccessTokenRefreshDao;
 
 import java.io.IOException;
 
@@ -25,7 +25,7 @@ public class GoogleDriveAuthorizationController {
     private String redirectUri;
 
     @Autowired
-    private GoogleAccessTokenRefreshService googleAccessTokenRefreshService;
+    private GoogleAccessTokenRefreshDao googleAccessTokenRefreshDao;
 
     @GetMapping("/auth")
     public String authorizeUser() {
@@ -37,7 +37,8 @@ public class GoogleDriveAuthorizationController {
     @GetMapping("/callback")
     public String handleCallback(@RequestParam("code") String code) {
         try {
-            GoogleTokenResponse googleTokenResponse = googleAuthorizationCodeFlow.newTokenRequest(code)
+            GoogleAuthorizationCodeTokenRequest googleAuthorizationCodeTokenRequest = googleAuthorizationCodeFlow.newTokenRequest(code);
+            GoogleTokenResponse googleTokenResponse = googleAuthorizationCodeTokenRequest
                     .setRedirectUri(redirectUri)
                     .execute();
             CredentialsResource credentialsResource = new CredentialsResource(googleTokenResponse.getAccessToken(), googleTokenResponse.getRefreshToken());
@@ -54,7 +55,7 @@ public class GoogleDriveAuthorizationController {
             trimmedRefreshToken = refreshToken.substring(7);
         }
 
-        String newAccessToken = googleAccessTokenRefreshService.refreshAccessToken(trimmedRefreshToken);
+        String newAccessToken = googleAccessTokenRefreshDao.refreshAccessToken(trimmedRefreshToken);
         CredentialsResource credentialsResource = new CredentialsResource(newAccessToken, trimmedRefreshToken);
         return gson.toJson(credentialsResource);
     }
