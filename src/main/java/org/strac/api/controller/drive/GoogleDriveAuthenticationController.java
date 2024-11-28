@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/oauth2")
-public class GoogleDriveAuthorizationController {
+public class GoogleDriveAuthenticationController {
     @Autowired
     private Gson gson;
 

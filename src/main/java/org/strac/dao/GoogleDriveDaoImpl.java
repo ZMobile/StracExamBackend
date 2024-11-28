@@ -86,9 +86,6 @@ public class GoogleDriveDaoImpl implements GoogleDriveDao {
             Drive.Files.Get metadataRequest = driveService.files().get(fileId).setFields("mimeType, name");
             com.google.api.services.drive.model.File fileMetadata = metadataRequest.execute();
             String mimeType = fileMetadata.getMimeType();
-            String fileName = fileMetadata.getName();
-            System.out.println("File Name: " + fileName);
-            System.out.println("MIME Type: " + mimeType);
 
             // Check if the file is a Google Workspace file that requires export
             if (mimeType.startsWith("application/vnd.google-apps")) {
@@ -97,11 +94,9 @@ public class GoogleDriveDaoImpl implements GoogleDriveDao {
                 if (exportMimeType == null) {
                     throw new RuntimeException("File type not supported for export: " + mimeType);
                 }
-                System.out.println("Exporting file to MIME type: " + exportMimeType);
                 driveService.files().export(fileId, exportMimeType).executeMediaAndDownloadTo(outputStream);
             } else {
                 // Directly download the binary file
-                System.out.println("Downloading binary file...");
                 driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
             }
         } catch (IOException e) {

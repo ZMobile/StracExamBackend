@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.strac.api.controller.drive.GoogleDriveAuthorizationController;
+import org.strac.api.controller.drive.GoogleDriveAuthenticationController;
 import org.strac.dao.config.StracExamDaoConfig;
 import org.strac.dao.token.GoogleAccessTokenRefreshDao;
 import org.strac.model.CredentialsResource;
@@ -20,12 +20,12 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = {GoogleDriveAuthorizationController.class, StracExamDaoConfig.class})
+@SpringBootTest(classes = {GoogleDriveAuthenticationController.class, StracExamDaoConfig.class})
 @ExtendWith(MockitoExtension.class)
-public class GoogleDriveAuthorizationControllerIntegrationTest {
+public class GoogleDriveAuthenticationControllerIntegrationTest {
 
     @Autowired
-    private GoogleDriveAuthorizationController googleDriveAuthorizationController;
+    private GoogleDriveAuthenticationController googleDriveAuthenticationController;
 
     @MockBean
     private GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow;
@@ -40,7 +40,7 @@ public class GoogleDriveAuthorizationControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(googleDriveAuthorizationController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(googleDriveAuthenticationController).build();
     }
 
     @Test

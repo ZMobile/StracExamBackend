@@ -47,12 +47,9 @@ public class GoogleAccessTokenAuthenticationFilter extends OncePerRequestFilter 
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String accessToken = authHeader.substring(7); // Remove "Bearer " prefix
-            System.out.println("Access token: " + accessToken);
             try {
-                System.out.println("Filtering...");
                 // Validate the Google API access token using the service
                 boolean isValid = googleAccessTokenValidatorDao.validateGoogleAccessToken(accessToken);
-                System.out.println("Is valid: " + isValid);
                 if (isValid) {
                     // If token is valid, proceed with authentication
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
