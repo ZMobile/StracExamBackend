@@ -15,7 +15,7 @@ import org.strac.api.filter.GoogleAccessTokenAuthenticationFilter;
 import org.strac.service.config.StracExamServiceConfig;
 import org.strac.dao.token.GoogleAccessTokenValidatorDao;
 
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 @Import({StracExamServiceConfig.class})
